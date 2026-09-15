@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --color-birthday-ink: #241436;
+  --color-birthday-void: #150a24;
+  --color-birthday-plum: #3a1c5c;
+  --color-birthday-violet: #7c3aed;
+  --color-birthday-magenta: #d946c8;
+  --color-birthday-pink: #f472b6;
+  --color-birthday-blush: #ffe0f0;
+  --color-birthday-gold: #f5d68a;
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-body: "Manrope", "Segoe UI", sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-birthday-void);
+  color: var(--color-birthday-blush);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-birthday-magenta);
+  color: white;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-birthday-gold);
+  outline-offset: 3px;
+}
