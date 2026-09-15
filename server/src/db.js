@@ -26,8 +26,11 @@ async function migrate() {
       completed BOOLEAN NOT NULL DEFAULT false,
       score INTEGER,
       percentage REAL,
-      completed_at TIMESTAMPTZ
+      completed_at TIMESTAMPTZ,
+      last_reaction TEXT
     );
+
+    ALTER TABLE sessions ADD COLUMN IF NOT EXISTS last_reaction TEXT;
   `);
 }
 

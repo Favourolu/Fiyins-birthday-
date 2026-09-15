@@ -1,6 +1,7 @@
 const express = require("express");
 const { pool } = require("../db");
 const { QUESTIONS } = require("../data/questions");
+const { pickReaction } = require("../data/reactions");
 const { requireParticipant } = require("../auth");
 
 const router = express.Router();
@@ -18,6 +19,7 @@ const PUBLIC_QUESTIONS = QUESTIONS.map(({ id, section, question, options }) => (
 
 const TOTAL_QUESTIONS = QUESTIONS.length;
 const validOptionSets = new Map(QUESTIONS.map((q) => [q.id, new Set(q.options)]));
+const correctAnswerById = new Map(QUESTIONS.map((q) => [q.id, q.correctAnswer]));
 
 async function getSession(username) {
   const { rows } = await pool.query("SELECT * FROM sessions WHERE username = $1", [username]);
@@ -39,6 +41,12 @@ router.get("/status", requireParticipant, async (req, res) => {
   });
 });
 
+// This is a one-shot lock-in, not a draft save: once a question id is a key
+// in `answers`, it is permanent for this session — the option can never be
+// changed, including by calling this route again for the same question.
+// The response deliberately never includes whether the answer was correct;
+// the server itself picks the ambiguous reaction text so that information
+// can't be recovered by inspecting network responses either.
 router.post("/answer", requireParticipant, async (req, res) => {
   const session = await getSession(req.username);
   if (session.completed) {
@@ -51,12 +59,20 @@ router.post("/answer", requireParticipant, async (req, res) => {
     return res.status(400).json({ error: "Invalid question or answer option." });
   }
 
+  if (questionId in session.answers) {
+    return res.status(403).json({ error: "This answer is already locked in." });
+  }
+
+  const isCorrect = answer === correctAnswerById.get(questionId);
+  const reaction = pickReaction(isCorrect, session.last_reaction);
   const answers = { ...session.answers, [questionId]: answer };
-  await pool.query("UPDATE sessions SET answers = $1 WHERE username = $2", [
+
+  await pool.query("UPDATE sessions SET answers = $1, last_reaction = $2 WHERE username = $3", [
     JSON.stringify(answers),
+    reaction,
     req.username,
   ]);
-  res.json({ ok: true });
+  res.json({ ok: true, reaction });
 });
 
 router.post("/submit", requireParticipant, async (req, res) => {
@@ -93,7 +109,7 @@ router.post("/retake", requireParticipant, async (req, res) => {
     return res.status(403).json({ error: "Retakes are not enabled." });
   }
   await pool.query(
-    "UPDATE sessions SET answers = '{}'::jsonb, completed = false, score = NULL, percentage = NULL, completed_at = NULL WHERE username = $1",
+    "UPDATE sessions SET answers = '{}'::jsonb, completed = false, score = NULL, percentage = NULL, completed_at = NULL, last_reaction = NULL WHERE username = $1",
     [req.username]
   );
   res.json({ ok: true });

@@ -5,6 +5,13 @@ import { api, ApiError, type Question } from "../lib/api";
 import ProgressBar from "../components/ProgressBar";
 import QuestionCard from "../components/QuestionCard";
 import SubmitModal from "../components/SubmitModal";
+import ReactionOverlay from "../components/ReactionOverlay";
+import FloatingPixels from "../components/FloatingPixels";
+
+function firstUnansweredIndex(questions: Question[], answers: Record<number, string>) {
+  const idx = questions.findIndex((q) => !(q.id in answers));
+  return idx === -1 ? Math.max(questions.length - 1, 0) : idx;
+}
 
 export default function Test() {
   const navigate = useNavigate();
@@ -14,7 +21,11 @@ export default function Test() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
+  const [pendingSelection, setPendingSelection] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [locking, setLocking] = useState(false);
+  const [burstOn, setBurstOn] = useState<string | null>(null);
+  const [reaction, setReaction] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -30,6 +41,7 @@ export default function Test() {
         const { questions: qs } = await api.getQuestions();
         setQuestions(qs);
         setAnswers(status.answers ?? {});
+        setIndex(firstUnansweredIndex(qs, status.answers ?? {}));
       } catch (err) {
         if (err instanceof ApiError && err.status === 401) {
           navigate("/login", { replace: true });
@@ -46,35 +58,64 @@ export default function Test() {
   const total = questions.length;
   const isFirst = index === 0;
   const isLast = index === total - 1;
-  const selected = current ? answers[current.id] ?? null : null;
+  const lockedAnswer = current ? answers[current.id] ?? null : null;
 
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
 
-  function selectOption(value: string) {
-    if (!current) return;
+  function selectPending(value: string) {
+    if (lockedAnswer !== null) return;
     setValidationError(null);
-    setAnswers((prev) => ({ ...prev, [current.id]: value }));
-    api.saveAnswer(current.id, value).catch(() => {
-      setValidationError("Your answer couldn't be saved — check your connection and try again.");
-    });
+    setPendingSelection(value);
   }
 
-  function goNext() {
-    if (!selected) {
-      setValidationError("Please select an answer before continuing.");
+  async function lockIn() {
+    if (!current || !pendingSelection) {
+      setValidationError("Please select an answer before locking it in.");
       return;
     }
+    setLocking(true);
     setValidationError(null);
+    try {
+      const res = await api.lockAnswer(current.id, pendingSelection);
+      setAnswers((prev) => ({ ...prev, [current.id]: pendingSelection }));
+      setBurstOn(pendingSelection);
+      setTimeout(() => setBurstOn(null), 650);
+      setReaction(res.reaction);
+    } catch (err) {
+      setValidationError(
+        err instanceof ApiError ? err.message : "Couldn't lock your answer — check your connection and try again."
+      );
+    } finally {
+      setLocking(false);
+    }
+  }
+
+  function advance() {
     if (isLast) {
       setModalOpen(true);
       return;
     }
     setDirection(1);
+    setPendingSelection(null);
     setIndex((i) => Math.min(i + 1, total - 1));
+  }
+
+  function continueFromReaction() {
+    setReaction(null);
+    advance();
+  }
+
+  function goNext() {
+    if (lockedAnswer !== null) {
+      advance();
+      return;
+    }
+    lockIn();
   }
 
   function goPrevious() {
     setValidationError(null);
+    setPendingSelection(null);
     setDirection(-1);
     setIndex((i) => Math.max(i - 1, 0));
   }
@@ -107,9 +148,12 @@ export default function Test() {
     );
   }
 
+  const isCurrentLocked = lockedAnswer !== null;
+
   return (
-    <div className="min-h-screen bg-birthday-void px-4 py-10 sm:py-16">
-      <div className="mx-auto w-full max-w-xl">
+    <div className="relative min-h-screen bg-birthday-void px-4 py-10 sm:py-16">
+      <FloatingPixels />
+      <div className="relative z-10 mx-auto w-full max-w-xl">
         <div className="mb-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-birthday-gold/70">
             Fiyin's Birthday Aptitude Challenge
@@ -123,9 +167,11 @@ export default function Test() {
             <QuestionCard
               key={current.id}
               question={current}
-              selected={selected}
-              onSelect={selectOption}
+              pendingSelection={pendingSelection}
+              lockedAnswer={lockedAnswer}
+              onSelect={selectPending}
               direction={direction}
+              burstOn={burstOn}
             />
           </AnimatePresence>
 
@@ -152,14 +198,19 @@ export default function Test() {
           <button
             type="button"
             onClick={goNext}
-            className="rounded-full bg-gradient-to-r from-birthday-magenta to-birthday-violet px-7 py-3 text-sm font-bold uppercase tracking-[0.15em] text-white shadow-lg transition hover:brightness-110"
+            disabled={locking || (!isCurrentLocked && !pendingSelection)}
+            className="rounded-full bg-gradient-to-r from-birthday-magenta to-birthday-violet px-7 py-3 text-sm font-bold uppercase tracking-[0.15em] text-white shadow-lg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isLast ? "Submit Test" : "Next →"}
+            {locking ? "Locking…" : isCurrentLocked ? (isLast ? "Submit Test" : "Continue →") : "Lock In"}
           </button>
         </div>
 
         <p className="mt-4 text-center text-xs text-birthday-blush/40">{answeredCount} of {total} answered</p>
       </div>
+
+      <AnimatePresence>
+        {reaction && <ReactionOverlay reaction={reaction} onContinue={continueFromReaction} />}
+      </AnimatePresence>
 
       <SubmitModal
         open={modalOpen}

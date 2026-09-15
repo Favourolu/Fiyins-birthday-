@@ -50,8 +50,8 @@ export const api = {
 
   getQuestions: () => request<{ questions: Question[]; total: number }>("/test/questions"),
   getStatus: () => request<StatusResponse>("/test/status"),
-  saveAnswer: (questionId: number, answer: string) =>
-    request<{ ok: true }>("/test/answer", {
+  lockAnswer: (questionId: number, answer: string) =>
+    request<{ ok: true; reaction: string }>("/test/answer", {
       method: "POST",
       body: JSON.stringify({ questionId, answer }),
     }),

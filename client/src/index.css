@@ -44,3 +44,30 @@ body {
   outline: 2px solid var(--color-birthday-gold);
   outline-offset: 3px;
 }
+
+@keyframes glitch-jitter {
+  0% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
+  15% { transform: translate(-2px, 1px); clip-path: inset(10% 0 40% 0); }
+  30% { transform: translate(2px, -1px); clip-path: inset(60% 0 5% 0); }
+  45% { transform: translate(-1px, 0); clip-path: inset(30% 0 30% 0); text-shadow: -2px 0 #f472b6, 2px 0 #7c3aed; }
+  60% { transform: translate(1px, 1px); clip-path: inset(5% 0 70% 0); }
+  75% { transform: translate(-1px, -1px); clip-path: inset(40% 0 10% 0); }
+  100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); text-shadow: none; }
+}
+
+.glitch-text {
+  animation: glitch-jitter 400ms steps(2, jump-none) 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch-text {
+    animation: none;
+  }
+}
+
+@keyframes pixel-drift {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.5; }
+  100% { transform: translate(var(--drift-x), var(--drift-y)); opacity: 0; }
+}
