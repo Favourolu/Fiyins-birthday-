@@ -1,27 +1,12 @@
-require("dotenv").config();
 const path = require("path");
 const express = require("express");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
+const app = require("./app");
 
-const authRoutes = require("./routes/auth");
-const testRoutes = require("./routes/test");
-const adminRoutes = require("./routes/admin");
-
-const app = express();
 const PORT = process.env.PORT || 4000;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
-app.use(express.json());
-app.use(cookieParser());
-if (CLIENT_ORIGIN) {
-  app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
-}
-
-app.use("/api/auth", authRoutes);
-app.use("/api/test", testRoutes);
-app.use("/api/admin", adminRoutes);
-
+// Local/traditional-host mode: serve the built client and fall back to it
+// for any non-API route (client-side routing). Not used on Vercel, where
+// the client is deployed as a separate static build.
 const clientDist = path.join(__dirname, "..", "..", "client", "dist");
 app.use(express.static(clientDist));
 app.get(/^(?!\/api\/).*/, (req, res) => {

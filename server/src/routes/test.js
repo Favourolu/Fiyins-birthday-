@@ -1,5 +1,5 @@
 const express = require("express");
-const { db } = require("../db");
+const { pool } = require("../db");
 const { QUESTIONS } = require("../data/questions");
 const { requireParticipant } = require("../auth");
 
@@ -19,28 +19,28 @@ const PUBLIC_QUESTIONS = QUESTIONS.map(({ id, section, question, options }) => (
 const TOTAL_QUESTIONS = QUESTIONS.length;
 const validOptionSets = new Map(QUESTIONS.map((q) => [q.id, new Set(q.options)]));
 
-function getSession(username) {
-  return db.prepare("SELECT * FROM sessions WHERE username = ?").get(username);
+async function getSession(username) {
+  const { rows } = await pool.query("SELECT * FROM sessions WHERE username = $1", [username]);
+  return rows[0];
 }
 
 router.get("/questions", requireParticipant, (req, res) => {
   res.json({ questions: PUBLIC_QUESTIONS, total: TOTAL_QUESTIONS });
 });
 
-router.get("/status", requireParticipant, (req, res) => {
-  const session = getSession(req.username);
-  const answers = JSON.parse(session.answers);
+router.get("/status", requireParticipant, async (req, res) => {
+  const session = await getSession(req.username);
   res.json({
     completed: !!session.completed,
-    answers,
+    answers: session.answers,
     score: session.completed ? session.score : undefined,
     percentage: session.completed ? session.percentage : undefined,
     total: TOTAL_QUESTIONS,
   });
 });
 
-router.post("/answer", requireParticipant, (req, res) => {
-  const session = getSession(req.username);
+router.post("/answer", requireParticipant, async (req, res) => {
+  const session = await getSession(req.username);
   if (session.completed) {
     return res.status(403).json({ error: "Test already submitted." });
   }
@@ -51,22 +51,21 @@ router.post("/answer", requireParticipant, (req, res) => {
     return res.status(400).json({ error: "Invalid question or answer option." });
   }
 
-  const answers = JSON.parse(session.answers);
-  answers[questionId] = answer;
-  db.prepare("UPDATE sessions SET answers = ? WHERE username = ?").run(
+  const answers = { ...session.answers, [questionId]: answer };
+  await pool.query("UPDATE sessions SET answers = $1 WHERE username = $2", [
     JSON.stringify(answers),
-    req.username
-  );
+    req.username,
+  ]);
   res.json({ ok: true });
 });
 
-router.post("/submit", requireParticipant, (req, res) => {
-  const session = getSession(req.username);
+router.post("/submit", requireParticipant, async (req, res) => {
+  const session = await getSession(req.username);
   if (session.completed) {
     return res.status(403).json({ error: "Test already submitted." });
   }
 
-  const answers = JSON.parse(session.answers);
+  const answers = session.answers;
   const unanswered = QUESTIONS.filter((q) => !(q.id in answers));
   if (unanswered.length > 0) {
     return res.status(400).json({
@@ -81,20 +80,22 @@ router.post("/submit", requireParticipant, (req, res) => {
   }
   const percentage = Math.round((score / TOTAL_QUESTIONS) * 100);
 
-  db.prepare(
-    "UPDATE sessions SET completed = 1, score = ?, percentage = ?, completed_at = ? WHERE username = ?"
-  ).run(score, percentage, new Date().toISOString(), req.username);
+  await pool.query(
+    "UPDATE sessions SET completed = true, score = $1, percentage = $2, completed_at = now() WHERE username = $3",
+    [score, percentage, req.username]
+  );
 
   res.json({ score, total: TOTAL_QUESTIONS, percentage });
 });
 
-router.post("/retake", requireParticipant, (req, res) => {
+router.post("/retake", requireParticipant, async (req, res) => {
   if (!ALLOW_RETAKE) {
     return res.status(403).json({ error: "Retakes are not enabled." });
   }
-  db.prepare(
-    "UPDATE sessions SET answers = '{}', completed = 0, score = NULL, percentage = NULL, completed_at = NULL WHERE username = ?"
-  ).run(req.username);
+  await pool.query(
+    "UPDATE sessions SET answers = '{}'::jsonb, completed = false, score = NULL, percentage = NULL, completed_at = NULL WHERE username = $1",
+    [req.username]
+  );
   res.json({ ok: true });
 });
 

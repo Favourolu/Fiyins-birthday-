@@ -1,6 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const { db } = require("../db");
+const { pool } = require("../db");
 const {
   COOKIE_NAME,
   ADMIN_COOKIE_NAME,
@@ -15,15 +15,17 @@ const {
 
 const router = express.Router();
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { username, password } = req.body || {};
   if (typeof username !== "string" || typeof password !== "string") {
     return res.status(400).json({ error: "Invalid username or password." });
   }
 
-  const participant = db
-    .prepare("SELECT username, password_hash FROM participants WHERE username = ?")
-    .get(username.trim().toLowerCase());
+  const { rows } = await pool.query(
+    "SELECT username, password_hash FROM participants WHERE username = $1",
+    [username.trim().toLowerCase()]
+  );
+  const participant = rows[0];
 
   const valid = participant && bcrypt.compareSync(password, participant.password_hash);
   if (!valid) {
@@ -40,10 +42,12 @@ router.post("/logout", (req, res) => {
   res.json({ ok: true });
 });
 
-router.get("/me", requireParticipant, (req, res) => {
-  const participant = db
-    .prepare("SELECT username, display_name FROM participants WHERE username = ?")
-    .get(req.username);
+router.get("/me", requireParticipant, async (req, res) => {
+  const { rows } = await pool.query(
+    "SELECT username, display_name FROM participants WHERE username = $1",
+    [req.username]
+  );
+  const participant = rows[0];
   res.json({ username: participant.username, displayName: participant.display_name });
 });
 
