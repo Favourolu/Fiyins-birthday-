@@ -16,6 +16,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
+  const [resetting, setResetting] = useState<string | null>(null);
 
   useEffect(() => {
     load();
@@ -41,6 +42,22 @@ export default function Admin() {
   async function handleLogout() {
     await api.adminLogout().catch(() => {});
     navigate("/admin/login");
+  }
+
+  async function handleReset(row: Row) {
+    const confirmed = window.confirm(
+      `Reset ${row.displayName}'s session? This clears their answers/score and lets them take the test again.`
+    );
+    if (!confirmed) return;
+    setResetting(row.username);
+    try {
+      await api.adminReset(row.username);
+      await load();
+    } catch {
+      setError(`Couldn't reset ${row.displayName}.`);
+    } finally {
+      setResetting(null);
+    }
   }
 
   const completedCount = rows.filter((r) => r.status === "Completed").length;
@@ -89,6 +106,7 @@ export default function Admin() {
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Score</th>
                   <th className="px-5 py-3 font-medium">Percentage</th>
+                  <th className="px-5 py-3 font-medium">Reset</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,6 +131,19 @@ export default function Admin() {
                     </td>
                     <td className="px-5 py-3.5 text-birthday-blush/80">
                       {row.percentage !== null ? `${row.percentage}%` : "—"}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {row.status === "Not Started" ? (
+                        <span className="text-birthday-blush/30">—</span>
+                      ) : (
+                        <button
+                          onClick={() => handleReset(row)}
+                          disabled={resetting === row.username}
+                          className="rounded-full border border-red-400/30 px-3 py-1.5 text-xs font-semibold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
+                        >
+                          {resetting === row.username ? "Resetting…" : "Reset"}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

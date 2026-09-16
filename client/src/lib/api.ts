@@ -58,6 +58,9 @@ export const api = {
   submit: () =>
     request<{ score: number; total: number; percentage: number }>("/test/submit", { method: "POST" }),
 
+  adminReset: (username: string) =>
+    request<{ ok: true }>(`/admin/reset/${encodeURIComponent(username)}`, { method: "POST" }),
+
   adminResults: () =>
     request<{
       results: Array<{
