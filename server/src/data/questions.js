@@ -1,172 +1,175 @@
-// Source of truth: Fiyin's Birthday Aptitude Challenge questionnaire.
-// Question text, options, section names and order are preserved exactly as given.
-// correctAnswer is a fixed, explicit value per question — never derived at runtime.
+// Fiyin's Birthday Aptitude Challenge — harder question set (v2).
+// Same 4 sections and participant names as the original questionnaire, but
+// considerably harder. correctAnswer is a fixed, explicit value per
+// question — never derived at runtime.
 const QUESTIONS = [
   {
     id: 1,
     section: "Verbal Reasoning",
     question:
-      "Murewa was RELUCTANT to join the birthday dance competition. Choose the word closest in meaning to RELUCTANT.",
-    options: ["Eager", "Unwilling", "Confident", "Certain", "Cheerful"],
-    correctAnswer: "Unwilling",
+      "Murewa was praised as PERSPICACIOUS during the birthday trivia round. Choose the word closest in meaning to PERSPICACIOUS.",
+    options: ["Naive", "Astute", "Reckless", "Indifferent", "Verbose"],
+    correctAnswer: "Astute",
   },
   {
     id: 2,
     section: "Verbal Reasoning",
     question:
-      "Mayokun complained that birthday cake was SCARCE. Choose the word opposite in meaning to SCARCE.",
-    options: ["Rare", "Limited", "Abundant", "Small", "Insufficient"],
-    correctAnswer: "Abundant",
+      "Chiamaka thought Deo's compliments at the party were OBSEQUIOUS. Choose the word opposite in meaning to OBSEQUIOUS.",
+    options: ["Servile", "Fawning", "Blunt", "Ingratiating", "Sycophantic"],
+    correctAnswer: "Blunt",
   },
   {
     id: 3,
     section: "Verbal Reasoning",
     question:
-      "All engineers in the birthday planning committee enjoy problem-solving. Idowu is an engineer in the committee. Which conclusion must be true?",
+      "All party planners who manage the guest list also manage the budget. Some people who manage the budget do not manage the venue. Anne is a party planner who manages the guest list. Which conclusion must be true?",
     options: [
-      "Idowu dislikes problem-solving.",
-      "Idowu enjoys problem-solving.",
-      "Everyone who enjoys problem-solving is an engineer.",
-      "Idowu is the best engineer.",
-      "No non-engineers enjoy problem-solving.",
+      "Anne does not manage the venue.",
+      "Anne manages the budget.",
+      "Anne manages the venue.",
+      "No one who manages the guest list manages the venue.",
+      "Everyone who manages the budget manages the guest list.",
     ],
-    correctAnswer: "Idowu enjoys problem-solving.",
+    correctAnswer: "Anne manages the budget.",
   },
   {
     id: 4,
     section: "Verbal Reasoning",
     question:
-      "Pelumi gave Eniola and Anne instructions for one of the birthday games. The instructions were so ________ that everyone completed the task without asking questions.",
-    options: ["Ambiguous", "Confusing", "Clear", "Lengthy", "Uncertain"],
-    correctAnswer: "Clear",
+      "Pelumi's explanation of the treasure hunt rules was so ________ that even after three repetitions, half the guests still misunderstood the starting point.",
+    options: ["Lucid", "Convoluted", "Meticulous", "Concise", "Transparent"],
+    correctAnswer: "Convoluted",
   },
   {
     id: 5,
     section: "Problem Solving",
     question:
-      "Ore bought a birthday shirt costing ₦12,000. It was discounted by 25%. What was the sale price?",
-    options: ["₦8,000", "₦9,000", "₦9,500", "₦10,000", "₦10,500"],
-    correctAnswer: "₦9,000",
+      "Eniola can decorate the party hall alone in 8 hours. Working together with Pipe, they finish in 3 hours. How long would Pipe take to decorate the hall alone?",
+    options: ["4.8 hours", "5 hours", "5.5 hours", "6 hours", "4.5 hours"],
+    correctAnswer: "4.8 hours",
   },
   {
     id: 6,
     section: "Problem Solving",
     question:
-      "Alex's bus travels 180 km in 3 hours. At the same speed, how far will it travel in 5 hours?",
-    options: ["240 km", "270 km", "300 km", "320 km", "360 km"],
-    correctAnswer: "300 km",
+      "Ore's savings first increased by 20%, then decreased by 25%, ending at ₦72,000. What was the original amount?",
+    options: ["₦75,000", "₦78,000", "₦80,000", "₦82,500", "₦90,000"],
+    correctAnswer: "₦80,000",
   },
   {
     id: 7,
     section: "Problem Solving",
     question:
-      "If Delight, Anjola, Pipe, Prisca and Chioma can complete a birthday setup in 12 days at the same rate, how many days would 10 friends need?",
-    options: ["3", "5", "6", "8", "10"],
-    correctAnswer: "6",
+      "Deo drove from the venue to the mall at 60 km/h and returned along the same route at 40 km/h. What was his average speed for the entire round trip?",
+    options: ["50 km/h", "48 km/h", "45 km/h", "52 km/h", "47 km/h"],
+    correctAnswer: "48 km/h",
   },
   {
     id: 8,
     section: "Problem Solving",
     question:
-      "Fiyin's birthday savings increased by 20% and became ₦72,000. What was the original amount?",
-    options: ["₦50,000", "₦55,000", "₦60,000", "₦62,000", "₦65,000"],
-    correctAnswer: "₦60,000",
+      "Delight, Prisca and Chioma set up chairs in the ratio 2:3:5 of the total needed. If Chioma set up 24 more chairs than Delight, how many chairs did Prisca set up?",
+    options: ["16", "20", "24", "28", "32"],
+    correctAnswer: "24",
   },
   {
     id: 9,
     section: "Critical Thinking",
     question:
-      'Deo says: "Everyone who came early to Fiyin’s birthday got a seat, so coming early guarantees getting a seat." What is the main weakness in this reasoning?',
+      'Anjola argues: "Every year the birthday committee has served jollof rice, and every year the party has been a success. Therefore, serving jollof rice causes the party to succeed." What is the primary flaw in this reasoning?',
     options: [
-      "It uses too many examples.",
-      "It assumes a relationship from limited evidence.",
-      "It contradicts the definition of a seat.",
-      "It proves that late arrivals get seats.",
-      "It uses a mathematical formula.",
+      "It relies on a false dichotomy.",
+      "It confuses correlation with causation.",
+      "It uses circular reasoning.",
+      "It appeals to popularity.",
+      "It contains a contradiction.",
     ],
-    correctAnswer: "It assumes a relationship from limited evidence.",
+    correctAnswer: "It confuses correlation with causation.",
   },
   {
     id: 10,
     section: "Critical Thinking",
     question:
-      "Chioma visits a restaurant that receives 10 five-star reviews after changing its menu. The owner concludes the new menu is definitely better. Which additional information would best test this conclusion?",
+      'Serah claims: "Since the guest list has grown every year for the past five years, we should book a venue twice the size of last year\'s to be safe." Which of the following, if true, would most weaken Serah\'s argument?',
     options: [
-      "The colour of the menu.",
-      "How many customers visited before and after the change.",
-      "The owner's favourite dish.",
-      "The restaurant's opening time.",
-      "The number of tables in the restaurant.",
+      "The venue used last year had some empty space.",
+      "This year, several long-time attendees have said they cannot attend due to travel conflicts.",
+      "The committee has more money to spend this year.",
+      "A bigger venue costs more to decorate.",
+      "The party will be held on a weekend this year.",
     ],
-    correctAnswer: "How many customers visited before and after the change.",
+    correctAnswer:
+      "This year, several long-time attendees have said they cannot attend due to travel conflicts.",
   },
   {
     id: 11,
     section: "Critical Thinking",
     question:
-      "Anne argues: \"We should buy more speakers because louder music will make Fiyin's birthday party more fun.\" Which statement is an assumption in this argument?",
+      "Chioma notices that guests who arrived within the first 30 minutes reported higher satisfaction scores than those who arrived late. She concludes early arrival causes higher satisfaction. Which finding would most strengthen her conclusion?",
     options: [
-      "The party has guests.",
-      "The speakers are available to buy.",
-      "Louder music will make the guests have more fun.",
-      "Music exists.",
-      "The party has a location.",
+      "Guests who arrived early were randomly assigned arrival times, and even after accounting for this, they still reported higher satisfaction.",
+      "The survey had 200 respondents.",
+      "Guests who arrived early tended to know the host personally.",
+      "The party had good weather that day.",
+      "Late guests missed the opening speech.",
     ],
-    correctAnswer: "Louder music will make the guests have more fun.",
+    correctAnswer:
+      "Guests who arrived early were randomly assigned arrival times, and even after accounting for this, they still reported higher satisfaction.",
   },
   {
     id: 12,
     section: "Critical Thinking",
     question:
-      'Prisca says: "I studied for one hour and failed, so studying does not help." Which response is the strongest critical-thinking response?',
+      'Idowu says: "Alex missed the trivia question about capital cities, so Alex clearly didn\'t study geography at all." What is the strongest criticism of Idowu\'s statement?',
     options: [
-      "Studying always guarantees success.",
-      "One experience is not enough evidence to conclude that studying is ineffective.",
-      "The student should never study again.",
-      "Failure means the exam was unfair.",
-      "Everyone learns in exactly the same way.",
+      "Missing one question does not establish that Alex did not study geography at all.",
+      "Idowu should not discuss Alex's performance publicly.",
+      "Trivia questions are not a fair way to test knowledge.",
+      "Alex may not enjoy geography.",
+      "The capital cities question was too difficult for anyone to answer.",
     ],
-    correctAnswer:
-      "One experience is not enough evidence to conclude that studying is ineffective.",
+    correctAnswer: "Missing one question does not establish that Alex did not study geography at all.",
   },
   {
     id: 13,
     section: "Quantitative Reasoning",
-    question: "Anjola is calculating the food budget. What is 15% of 240?",
-    options: ["24", "30", "36", "40", "45"],
-    correctAnswer: "36",
+    question:
+      "Murewa's prize fund increased by 10% in the first month and by a further 10% in the second month. By what overall percentage did the fund increase after two months?",
+    options: ["20%", "21%", "22%", "19%", "24%"],
+    correctAnswer: "21%",
   },
   {
     id: 14,
     section: "Quantitative Reasoning",
     question:
-      "At Fiyin's birthday event, the ratio of boys to girls is 3:5. If 24 boys are attending, how many girls are there?",
-    options: ["30", "36", "40", "45", "48"],
-    correctAnswer: "40",
+      "At Fiyin's second birthday event, the ratio of boys to girls was 4:7. After 20 more girls arrived and no boys left, the ratio became 4:11. How many boys were at the event?",
+    options: ["16", "18", "20", "24", "28"],
+    correctAnswer: "20",
   },
   {
     id: 15,
     section: "Quantitative Reasoning",
     question:
-      "Delight is playing a number game with Eniola. What is the next number in the sequence? 3, 6, 12, 24, ________",
-    options: ["30", "36", "42", "48", "54"],
-    correctAnswer: "48",
+      "Anjola is playing a number game with Eniola. What is the next number in the sequence? 2, 3, 7, 16, 32, ________",
+    options: ["54", "57", "60", "64", "50"],
+    correctAnswer: "57",
   },
   {
     id: 16,
     section: "Quantitative Reasoning",
     question:
-      "A box contains 4 red, 3 blue, and 3 green balls. If Pipe chooses one ball at random, what is the probability that it is blue?",
-    options: ["1/2", "1/3", "3/10", "2/5", "3/7"],
-    correctAnswer: "3/10",
+      "A box contains 5 red, 4 blue, and 3 green balls. Pipe draws two balls at random without replacement. What is the probability that both balls are red?",
+    options: ["5/33", "1/6", "5/44", "2/11", "5/22"],
+    correctAnswer: "5/33",
   },
   {
     id: 17,
     section: "Quantitative Reasoning",
     question:
-      "In a room of 100 people, 99% are left-handed. How many left-handed people have to leave the room to bring that percentage down to 98%?",
-    options: ["1", "2", "25", "50", "75"],
-    correctAnswer: "1",
+      "In a room of 120 guests, 40% are wearing red. If a number of red-wearing guests leave and no one else leaves, the percentage wearing red drops to 25%. How many guests left the room?",
+    options: ["18", "20", "22", "24", "30"],
+    correctAnswer: "24",
   },
 ];
 
