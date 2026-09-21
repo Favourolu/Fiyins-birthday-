@@ -20,6 +20,7 @@ const PARTICIPANT_NAMES = [
   "chioma",
   "murewa",
   "idowu",
+  "Ranti",
 ];
 
 const seen = new Map();
