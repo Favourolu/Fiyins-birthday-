@@ -4,6 +4,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Test from "./pages/Test";
 import Result from "./pages/Result";
+import Leaderboard from "./pages/Leaderboard";
 import AdminLogin from "./pages/AdminLogin";
 import Admin from "./pages/Admin";
 
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/test" element={<Test />} />
         <Route path="/result" element={<Result />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<Navigate to="/" replace />} />

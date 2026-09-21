@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { api, ApiError } from "../lib/api";
 import Confetti from "../components/Confetti";
 
@@ -127,6 +127,20 @@ export default function Result() {
       >
         Thanks for taking on the challenge — your answers have been locked in and recorded.
       </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1.9 }}
+        className="relative z-10 mt-6"
+      >
+        <Link
+          to="/leaderboard"
+          className="inline-block rounded-full bg-gradient-to-r from-birthday-magenta to-birthday-violet px-7 py-3 text-sm font-bold uppercase tracking-[0.15em] text-white shadow-lg transition hover:brightness-110"
+        >
+          View Leaderboard →
+        </Link>
+      </motion.div>
     </div>
   );
 }

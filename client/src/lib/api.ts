@@ -61,6 +61,12 @@ export const api = {
   adminReset: (username: string) =>
     request<{ ok: true }>(`/admin/reset/${encodeURIComponent(username)}`, { method: "POST" }),
 
+  getLeaderboard: () =>
+    request<{
+      leaderboard: Array<{ rank: number; displayName: string; score: number; percentage: number; isYou: boolean }>;
+      total: number;
+    }>("/leaderboard"),
+
   adminResults: () =>
     request<{
       results: Array<{

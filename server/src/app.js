@@ -7,6 +7,7 @@ const { ready } = require("./db");
 const authRoutes = require("./routes/auth");
 const testRoutes = require("./routes/test");
 const adminRoutes = require("./routes/admin");
+const leaderboardRoutes = require("./routes/leaderboard");
 
 const app = express();
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
@@ -31,6 +32,7 @@ app.use(async (req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
